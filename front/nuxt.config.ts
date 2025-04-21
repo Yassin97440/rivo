@@ -11,7 +11,8 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
     'vuetify-nuxt-module',
     '@nuxtjs/tailwindcss',
-    'pinia-plugin-persistedstate'
+    'pinia-plugin-persistedstate',
+    '@nuxtjs/supabase'
   ],
   vite: {
     vue: {

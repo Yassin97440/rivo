@@ -4,8 +4,8 @@ import type { Document } from "langchain/document";
 import type { BaseMessage } from "@langchain/core/messages";
 import { isAIMessage } from "@langchain/core/messages";
 import type { AIMessage } from "@langchain/core/messages";
-import { ChatGraph, getMemoryConfig } from "@yassin97440/mistral-gagnant";
-import { updateRetrieverConfig } from "@yassin97440/mistral-gagnant";
+import { ChatGraph, getMemoryConfig } from "@yassin97440/rivo-core";
+import { updateRetrieverConfig } from "@yassin97440/rivo-core";
 import type ChatParams from "../../../core/dist/types/ChatParams";
 
 export class Main {

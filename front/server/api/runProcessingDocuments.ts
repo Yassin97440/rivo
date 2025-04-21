@@ -1,5 +1,5 @@
 import { Main } from "~~/services/Chat/Main"
-import { DocumentHandler } from "@yassin97440/mistral-gagnant"
+import { DocumentHandler } from "@yassin97440/rivo-core"
 import DocumentProcessingParams from "../../../core/dist/types/DocumentProcessingParams";
 const main = Main.getInstance()
 

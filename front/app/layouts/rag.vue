@@ -1,5 +1,5 @@
 <template>
-  <v-app bg-color="interface-bg">
+  <v-app v-if="user">
     <!-- Même app bar que Default.vue -->
     <v-app-bar flat color="transparent" class="glass-panel px-4">
       <div class="d-flex align-center">
@@ -47,6 +47,13 @@
 </template>
 
 <script setup lang="ts">
+// Utiliser le middleware d'authentification pour ce layout
+definePageMeta({
+  middleware: ['auth']
+});
+
+// Ce layout ne sera utilisé que pour les utilisateurs authentifiés
+const user = useSupabaseUser();
 
 const settingsDialogOpen = ref(false);
 
