@@ -4,6 +4,9 @@ import {
     SystemMessage,
     ToolMessage,
 } from "@langchain/core/messages";
+import { PostgresChatMessageHistory } from "@langchain/community/stores/message/postgres";
+import pg from 'pg';
+
 import { MemorySaver, MessagesAnnotation, StateGraph } from "@langchain/langgraph";
 import { ToolNode, toolsCondition } from "@langchain/langgraph/prebuilt";
 
@@ -20,7 +23,7 @@ export class ChatGraph {
     private model: string;
     private temperature: number;
     private tools = new ToolNode([retrieve]);
-    private memory = new MemorySaver;
+    private memory: PostgresChatMessageHistory;
 
     private baseSystemPrompt =
         "You are an versatile assistant like Alfred from the movie 'The Dark Knight', or Jarvis from Iron Man." +
@@ -35,6 +38,23 @@ export class ChatGraph {
     private constructor(model: string = "mistral", temperature: number = 0.0) {
         this.model = model;
         this.temperature = temperature;
+        
+        const poolConfig = {
+            host: process.env.PG_HOST || 'db.phweeegnovwpduxymnsz.supabase.co',
+            port: process.env.PG_PORT || '5432',
+            user: process.env.PG_USER || 'postgres',
+            password: process.env.PG_PASSWORD || 'postgres',
+            database: process.env.PG_DATABASE || 'postgres'
+        }
+        const pool = new pg.Pool(poolConfig);
+        
+        // Initialiser la mémoire 
+        this.memory = new PostgresChatMessageHistory({
+            tableName: 'langchain_chat_history',
+            sessionId: 'default-session',
+            pool
+        });
+        
         this.graph = this.compile();
     }
 
@@ -124,7 +144,11 @@ export class ChatGraph {
             .addEdge("tools", "generate")
             .addEdge("generate", "__end__");
 
-        const graph = graphBuilder.compile({ checkpointer: this.memory });
+        const memorySaver = new MemorySaver({
+            store: this.memory
+        });
+        
+        const graph = graphBuilder.compile({ checkpointer: memorySaver });
         return graph
     }
 }
