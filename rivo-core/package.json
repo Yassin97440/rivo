@@ -36,6 +36,7 @@
     "@langchain/mistralai": "^0.2.0",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.14.1",
+    "@types/pg": "^8.11.13",
     "chromadb": "^2.2.0",
     "chromadb-default-embed": "^2.14.0",
     "jest": "^29.7.0",
