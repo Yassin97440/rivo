@@ -15,6 +15,7 @@ import retrieve from "../tools/vectoreStore/Retriever";
 
 import { ChatOllama } from "@langchain/ollama";
 import { OllamaClientFactory } from "../LLM/OllamaClientFactory";
+import { PostgresCheckpointer } from "../data/connectors/PostgresCheckpointer";
 // const llm = MistralClient.getInstance().client;
 
 
@@ -133,6 +134,7 @@ export class ChatGraph {
     }
 
     public compile() {
+        const checkpointer = new PostgresCheckpointer();
         const graphBuilder = new StateGraph(MessagesAnnotation)
             .addNode("queryOrRespond", this.queryOrRespond)
             .addNode("tools", this.tools)
@@ -146,7 +148,9 @@ export class ChatGraph {
             .addEdge("generate", "__end__");
         
         const graph = graphBuilder
-            .compile();
+            .compile({
+                checkpointer: checkpointer.checkpointer
+            });
         return graph;
     }
 }
