@@ -32,7 +32,7 @@
     "@jest/globals": "^29.7.0",
     "@langchain/community": "^0.3.42",
     "@langchain/core": "^0.3.47",
-    "@langchain/langgraph": "^0.2.60",
+    "@langchain/langgraph": "^0.2.69",
     "@langchain/mistralai": "^0.2.0",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.14.1",
