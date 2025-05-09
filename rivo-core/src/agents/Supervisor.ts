@@ -1,79 +1,58 @@
 import { z } from "zod";
 import { ChatMistralAI } from "@langchain/mistralai";
 import { ChatPromptTemplate, MessagesPlaceholder } from "@langchain/core/prompts";
-import { END } from "@langchain/langgraph/dist/constants";
+import { END } from "@langchain/langgraph";
 
-export class Supervisor {
-    private static instance: Supervisor;
-    private members = ["researcher", "vector_retriever"] as const;
-    private options = [END, ...this.members];
-    private llm: ChatMistralAI;
-    private supervisorChain: any;
+const members = ["researcher", "vector_retriever"] as const;
 
-    private systemPrompt =
-        "You are a supervisor tasked with managing a conversation between the" +
-        " following workers: {members}. Given the following user request," +
-        " respond with the worker to act next. Each worker will perform a" +
-        " task and respond with their results and status. When finished," +
-        " respond with FINISH.";
+const systemPrompt =
+    "You are a supervisor tasked with managing a conversation between the" +
+    " following workers: {members}. Given the following user request," +
+    " respond with the worker to act next. Each worker will perform a" +
+    " task and respond with their results and status. When finished," +
+    " respond with FINISH.";
+const options = [END, ...members];
 
-    private routingTool = {
-        name: "route",
-        description: "Select the next role.",
-        schema: z.object({
-            next: z.enum([END, ...this.members]),
-        }),
-    }
-
-    private constructor() {
-        this.llm = new ChatMistralAI({
-            modelName: "mistral-large-latest",
-            temperature: 0,
-        });
-        this.initSupervisorChain();
-    }
-
-    public static getInstance(): Supervisor {
-        if (!Supervisor.instance) {
-            Supervisor.instance = new Supervisor();
-        }
-        return Supervisor.instance;
-    }
-
-    private async initSupervisorChain() {
-        const prompt = ChatPromptTemplate.fromMessages([
-            ["system", this.systemPrompt],
-            new MessagesPlaceholder("messages"),
-            [
-                "human",
-                "Given the conversation above, who should act next?" +
-                " Or should we FINISH? Select one of: {options}",
-            ],
-        ]);
-
-        const formattedPrompt = await prompt.partial({
-            options: this.options.join(", "),
-            members: this.members.join(", "),
-        });
-
-        this.supervisorChain = formattedPrompt
-            .pipe(this.llm.bindTools(
-                [this.routingTool],
-                {
-                    tool_choice: "any",
-                },
-            ))
-            .pipe((x) => (x.tool_calls?.[0]?.args));
-    }
-
-    public getSupervisorChain() {
-        return this.supervisorChain;
-    }
-
-    public getMembers() {
-        return this.members;
-    }
+// Define the routing function
+const routingTool = {
+    name: "route",
+    description: "Select the next role.",
+    schema: z.object({
+        next: z.enum([END, ...members]),
+    }),
 }
 
-export const supervisorChain = Supervisor.getInstance().getSupervisorChain();
-export const members = Supervisor.getInstance().getMembers();
+const prompt = ChatPromptTemplate.fromMessages([
+    ["system", systemPrompt],
+    new MessagesPlaceholder("messages"),
+    [
+        "human",
+        "Given the conversation above, who should act next?" +
+        " Or should we FINISH? Select one of: {options}",
+    ],
+]);
+
+async function createSupervisorChain(model: string | "mistral-large-latest", temperature: number | 0) {
+    const formattedPrompt = await prompt.partial({
+        options: options.join(", "),
+        members: members.join(", "),
+    });
+
+    const llm = new ChatMistralAI({
+        modelName: model,
+        temperature: temperature,
+    });
+
+    return formattedPrompt
+        .pipe(llm.bindTools(
+            [routingTool],
+            {
+                tool_choice: "any",
+            },
+        ))
+        // select the first one
+        .pipe((x: any) => (x.tool_calls[0].args));
+}
+
+const supervisorChain = createSupervisorChain("mistral-large-latest", 0);
+export { supervisorChain, members };
