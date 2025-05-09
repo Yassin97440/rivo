@@ -11,7 +11,7 @@ import pg from 'pg';
 import { MemorySaver, MessagesAnnotation, StateGraph } from "@langchain/langgraph";
 import { ToolNode, toolsCondition } from "@langchain/langgraph/prebuilt";
 
-import retrieve from "../tools/vectoreStore/Retriever";
+import retrieveTool from "../tools/vectoreStore/Retriever";
 
 import { ChatOllama } from "@langchain/ollama";
 import { OllamaClientFactory } from "../LLM/OllamaClientFactory";
@@ -23,7 +23,7 @@ export class ChatGraph {
     private graph: any;
     private model: string;
     private temperature: number;
-    private tools = new ToolNode([retrieve]);
+    private tools = new ToolNode([retrieveTool]);
     private memory: PostgresChatMessageHistory;
 
     private baseSystemPrompt =
@@ -39,7 +39,7 @@ export class ChatGraph {
     private constructor(model: string = "mistral", temperature: number = 0.0) {
         this.model = model;
         this.temperature = temperature;
-        
+
         const poolConfig = {
             host: process.env.PG_HOST || 'db.phweeegnovwpduxymnsz.supabase.co',
             port: 5432,
@@ -48,14 +48,14 @@ export class ChatGraph {
             database: process.env.PG_DATABASE || 'postgres'
         }
         const pool = new pg.Pool(poolConfig);
-        
+
         // Initialiser la mémoire 
         this.memory = new PostgresChatMessageHistory({
             tableName: 'langchain_chat_history',
             sessionId: 'default-session',
             pool
         });
-        
+
         this.graph = this.compile();
     }
 
@@ -82,7 +82,7 @@ export class ChatGraph {
 
     // Step 1: Generate an AIMessage that may include a tool-call to be sent.
     async queryOrRespond(state: typeof MessagesAnnotation.State) {
-        const llmWithTools = ChatGraph.instance.getLlm().bindTools([retrieve]);
+        const llmWithTools = ChatGraph.instance.getLlm().bindTools([retrieveTool]);
         const systemUserPrompt = [
             new SystemMessage(ChatGraph.instance.baseSystemPrompt),
             ...state.messages
@@ -144,7 +144,7 @@ export class ChatGraph {
             })
             .addEdge("tools", "generate")
             .addEdge("generate", "__end__");
-        
+
         const graph = graphBuilder
             .compile();
         return graph;
