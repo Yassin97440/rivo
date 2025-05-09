@@ -23,7 +23,7 @@ const initVectorStore = async () => {
   }
 };
 
-const retrieve = tool(
+const retrieveTool = tool(
   async ({ query }) => {
     if (!vectorStore) await initVectorStore();
     console.log("retrieving for query", query);
@@ -46,4 +46,4 @@ const retrieve = tool(
   }
 );
 
-export default retrieve;
+export default retrieveTool;

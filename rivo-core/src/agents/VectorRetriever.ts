@@ -1,23 +1,20 @@
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { createReactAgent } from "@langchain/langgraph/prebuilt";
-import { tavilyTool } from "../tools/InternetResearch";
 import { MistralClient } from "../LLM/MistralAPIClient";
-import { RunnableConfig } from "@langchain/core/runnables";
+import retrieveTool from "../tools/vectoreStore/Retriever";
 import AgentState from "../config/AgentState";
+import { RunnableConfig } from "@langchain/core/runnables";
 
-
-const researcherAgent = createReactAgent({
+const vectorRetrieverAgent = createReactAgent({
     llm: MistralClient.getInstance().client,
-    tools: [tavilyTool],
-    stateModifier: new SystemMessage("You are a web researcher. You may use the Tavily search engine to search the web for" +
-        " important information, so the Chart Generator in your team can make useful plots.")
+    tools: [retrieveTool],
+    stateModifier: new SystemMessage("You are an expert on vector retrieval. You may use the vector retriever to retrieve information from the vector store.")
 })
-
-const researcherNode = async (
+const vectorRetrieverNode = async (
     state: typeof AgentState.State,
     config?: RunnableConfig,
 ) => {
-    const result = await researcherAgent.invoke(state, config);
+    const result = await vectorRetrieverAgent.invoke(state, config);
     const lastMessage = result.messages[result.messages.length - 1];
     return {
         messages: [
@@ -26,4 +23,5 @@ const researcherNode = async (
     };
 };
 
-export { researcherNode };
+
+export { vectorRetrieverNode };
