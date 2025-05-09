@@ -19,9 +19,10 @@ const researcherNode = async (
 ) => {
     const result = await researcherAgent.invoke(state, config);
     const lastMessage = result.messages[result.messages.length - 1];
+    console.log("🚀 ~ lastMessage:", lastMessage)
     return {
         messages: [
-            new HumanMessage({ content: lastMessage.content, name: "Researcher" }),
+            new HumanMessage({ content: lastMessage.content.toString(), name: "Researcher" }),
         ],
     };
 };

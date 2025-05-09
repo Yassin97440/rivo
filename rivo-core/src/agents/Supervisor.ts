@@ -27,7 +27,7 @@ const prompt = ChatPromptTemplate.fromMessages([
     new MessagesPlaceholder("messages"),
     [
         "human",
-        "Given the conversation above, who should act next?" +
+        "Given the conversation above, who should act next? If you have necessary information for respond, choose END." +
         " Or should we FINISH? Select one of: {options}",
     ],
 ]);

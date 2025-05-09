@@ -1,4 +1,4 @@
-import { START, StateGraph } from "@langchain/langgraph";
+import { END, START, StateGraph } from "@langchain/langgraph";
 import { members, supervisorChain } from "../agents/Supervisor";
 import AgentState from "../config/AgentState";
 import { researcherNode } from "../agents/ResearcherAgent";
@@ -23,6 +23,7 @@ async function createSupervisorGraph() {
     );
 
     workflow.addEdge(START, "supervisor");
+    workflow.addEdge("supervisor", END);
 
     return workflow.compile();
 }
