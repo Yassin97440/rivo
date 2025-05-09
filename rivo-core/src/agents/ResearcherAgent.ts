@@ -19,10 +19,22 @@ const researcherNode = async (
 ) => {
     const result = await researcherAgent.invoke(state, config);
     const lastMessage = result.messages[result.messages.length - 1];
-    console.log("🚀 ~ lastMessage:", lastMessage)
+    console.log("🚀 ~ lastMessage:", result)
+
+    // Traitement correct du contenu du message
+    let content = lastMessage.content;
+    if (Array.isArray(content)) {
+        // Si c'est un tableau, le transformer en chaîne JSON ou extraire le texte approprié
+        content = content.map((item: any) =>
+            typeof item === 'object' ? JSON.stringify(item) : item.toString()
+        ).join("\n");
+    } else if (typeof content === 'object') {
+        // Si c'est un objet, le transformer en chaîne JSON
+        content = JSON.stringify(content);
+    }
     return {
         messages: [
-            new HumanMessage({ content: lastMessage.content.toString(), name: "Researcher" }),
+            new HumanMessage({ content: content, name: "Researcher" }),
         ],
     };
 };
