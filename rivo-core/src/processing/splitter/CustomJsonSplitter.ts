@@ -4,7 +4,7 @@ import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 export interface DocumentChunk {
   pageContent: string;
   metadata: {
-    [key: string]: any; 
+    [key: string]: any;
   };
 }
 
@@ -28,16 +28,15 @@ export class CustomJsonSplitter {
   ): Promise<DocumentChunk[]> {
     // Étape 1 : transformer le JSON en texte lisible
     const rawText = this.flattenJson(jsonData);
-  
     // Étape 2 : split via LangChain
     const splitter = new RecursiveCharacterTextSplitter({
       chunkSize: this.chunkSize,
       chunkOverlap: this.chunkOverlap,
       separators: ["\n\n", "\n", "."], // découpage intelligent
     });
-  
+
     const docs = await splitter.createDocuments([rawText]);
-  
+
     // Étape 3 : enrichir avec les métadonnées
     return docs.map((doc, index) => ({
       pageContent: doc.pageContent,
