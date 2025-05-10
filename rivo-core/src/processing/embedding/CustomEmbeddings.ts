@@ -11,7 +11,12 @@ export class CustomEmbeddings implements EmbeddingsInterface {
     async embedQuery(text: string): Promise<number[]> {
         const pipe = await this.pipeline();
         const result = await pipe(text);
-        const embedding = Array.from(result.data) as number[];
+
+        // Extraire seulement le premier vecteur d'embedding (384 dimensions)
+        const embeddingDim = result.ort_tensor.dims[2]; // 384
+        const tensorData = Array.from(result.data) as number[];
+        const embedding = tensorData.slice(0, embeddingDim);
+
         console.log("Dimension du vecteur de requête:", embedding.length);
         return embedding;
     }
@@ -22,6 +27,7 @@ export class CustomEmbeddings implements EmbeddingsInterface {
 
         // Extraire les dimensions correctes du tenseur
         const embeddingDim = result.ort_tensor.dims[2]; // Dimension du vecteur (384)
+        console.log("🚀 ~ CustomEmbeddings ~ embedDocuments ~ embeddingDim dimension du vecteur:", embeddingDim)
         const embeddings: number[][] = [];
 
         // Le modèle all-MiniLM-L6-v2 produit des vecteurs de 384 dimensions
