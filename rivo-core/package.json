@@ -28,7 +28,6 @@
     "@babel/core": "^7.26.10",
     "@babel/preset-env": "^7.26.9",
     "@babel/preset-typescript": "^7.27.0",
-    "@huggingface/inference": "^2.8.1",
     "@jest/globals": "^29.7.0",
     "@langchain/community": "^0.3.42",
     "@langchain/core": "^0.3.47",
@@ -48,6 +47,8 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
+    "@huggingface/inference": "^2.8.1",
+    "@huggingface/transformers": "^3.5.1",
     "@langchain/mistralai": "^0.2.0",
     "@langchain/ollama": "^0.2.0",
     "@langchain/tavily": "^0.1.1",
