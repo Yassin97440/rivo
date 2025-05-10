@@ -28,7 +28,7 @@ const retrieveTool = tool(
     try {
       if (!vectorStore) await initVectorStore();
       console.log("retrieving for query", query);
-      const retrievedDocs = await vectorStore.similaritySearch(query.toString(), 4);
+      const retrievedDocs = await vectorStore.similaritySearch(query.toString(), 7);
 
       const serialized = retrievedDocs
         .map(
