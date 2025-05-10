@@ -9,7 +9,7 @@ async function createSupervisorGraph() {
     const workflow = new StateGraph(AgentState)
         // 2. Add the nodes; these will do the work
         .addNode("researcher", researcherNode)
-        .addNode("vector_retriever", vectorRetrieverNode)
+        .addNode("vector_store_retriever", vectorRetrieverNode)
         .addNode("supervisor", await supervisorChain);
     // 3. Define the edges. We will define both regular and conditional ones
     // After a worker completes, report to supervisor

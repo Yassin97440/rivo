@@ -2,8 +2,9 @@ import { z } from "zod";
 import { ChatMistralAI } from "@langchain/mistralai";
 import { ChatPromptTemplate, MessagesPlaceholder } from "@langchain/core/prompts";
 import { END } from "@langchain/langgraph";
+import synthesizeTool from "../tools/Synthesizer";
 
-const members = ["researcher", "vector_retriever"] as const;
+const members = ["researcher", "vector_store_retriever"] as const;
 
 const systemPrompt =
     "You are a supervisor tasked with managing a conversation between the" +
@@ -27,7 +28,7 @@ const prompt = ChatPromptTemplate.fromMessages([
     new MessagesPlaceholder("messages"),
     [
         "human",
-        "Given the conversation above, who should act next? If you have necessary information for respond, choose END." +
+        "Given the conversation above, who should act next?" +
         " Or should we FINISH? Select one of: {options}",
     ],
 ]);
@@ -45,7 +46,7 @@ async function createSupervisorChain(model: string | "mistral-large-latest", tem
 
     return formattedPrompt
         .pipe(llm.bindTools(
-            [routingTool],
+            [routingTool, synthesizeTool],
             {
                 tool_choice: "any",
             },
