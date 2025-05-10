@@ -3,6 +3,7 @@ import { members, supervisorChain } from "../agents/Supervisor";
 import AgentState from "../config/AgentState";
 import { researcherNode } from "../agents/ResearcherAgent";
 import { vectorRetrieverNode } from "../agents/VectorRetriever";
+import { AIMessage, BaseMessage } from "@langchain/core/messages";
 
 async function createSupervisorGraph() {
     // 1. Create the graph
@@ -19,7 +20,14 @@ async function createSupervisorGraph() {
 
     workflow.addConditionalEdges(
         "supervisor",
-        (x: typeof AgentState.State) => x.next,
+        (x: typeof AgentState.State) => {
+            // Si c'est END et qu'il y a une analyse, l'ajouter comme dernier message
+            if (x.next === END && x.analysis) {
+                const assistantMessage = new AIMessage(x.analysis, { name: "supervisor" });
+                x.messages.push(assistantMessage);
+            }
+            return x.next;
+        },
     );
 
     workflow.addEdge(START, "supervisor");

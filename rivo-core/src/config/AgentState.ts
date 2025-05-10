@@ -13,5 +13,9 @@ const AgentState = Annotation.Root({
         reducer: (x, y) => y ?? x ?? END,
         default: () => END,
     }),
+    analysis: Annotation<string>({
+        reducer: (x, y) => y ?? x ?? "",
+        default: () => "",
+    }),
 });
 export default AgentState;
