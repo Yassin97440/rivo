@@ -3,7 +3,7 @@ import { getSupabaseVectorStore } from "../../data/connectors/SupabaseVectorStor
 import { CustomJsonSplitter, DocumentChunk } from "../splitter/CustomJsonSplitter";
 import { SupabaseVectorStore } from "@langchain/community/vectorstores/supabase";
 import { BlockData } from "../../types/BlockData";
-import  DocumentProcessingParams  from "../../types/DocumentProcessingParams";
+import DocumentProcessingParams from "../../types/DocumentProcessingParams";
 export class DocumentHandler {
     private BATCH_SIZE = 50;
     private vectoreStore: SupabaseVectorStore;
@@ -22,7 +22,7 @@ export class DocumentHandler {
 
         const allDocuments = await this.getAllDocumentsFromNotionDb();
 
-        console.log(`Total documents à traiter : ${allDocuments}`);
+        console.log(`Total documents à traiter : `, allDocuments.length);
 
         for (let i = 0; i < allDocuments.length; i += this.BATCH_SIZE) {
             const batch = allDocuments.slice(i, i + this.BATCH_SIZE);
@@ -57,9 +57,10 @@ export class DocumentHandler {
 
         let allDocumentsContents: BlockData[] = [];
         for (let i = 0; i < pages.length; i++) {
-
-            allDocumentsContents.push(await notionClient.getPageContent(pages[i]))
-            console.info("🚀 ~ DocumentHandler ~ getAllDocumentsFromNotionDb ~ allDocumentsContents: page terminé ", i)
+            const pageContent = await notionClient.getPageContent(pages[i]);
+            if (pageContent.content?.length > 0) {
+                allDocumentsContents.push(pageContent)
+            }
 
         }
         return allDocumentsContents;
@@ -89,7 +90,7 @@ export class DocumentHandler {
 
 
 
-    private addMetadataToChunk(jsonChunks: DocumentChunk[], doc: BlockData) : DocumentChunk[] {
+    private addMetadataToChunk(jsonChunks: DocumentChunk[], doc: BlockData): DocumentChunk[] {
         return jsonChunks.map((split, index) => {
             split.metadata = {
                 "create_date": doc.createdAt,
@@ -107,7 +108,6 @@ export class DocumentHandler {
                 "chunk_position": index === 0 ? "début" : index === jsonChunks.length - 1 ? "fin" : "milieu",
                 // chunk_keywords: extractKeywords(split.pageContent)
             };
-            console.log("🚀 ~ DocumentHandler ~ returnjsonChunks.map ~ split:", split);
             return split;
         });
     }

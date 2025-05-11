@@ -38,15 +38,16 @@
 
       <div class="tech-section-header mt-2 mb-3">
         <div class="tech-line"></div>
+        <v-icon class="ml-1">mdi-chat-outline</v-icon>
         <span class="text-caption   text-primary mx-2 ">CONVERSATIONS</span>
         <div class="tech-line"></div>
       </div>
 
       <div class="chat-list">
         <v-list à density="compact" bg-color="transparent" color="flex justify-start">
-          <v-list-item v-for="chat in chatStore.chats" :key="chat.id" :title="`${chat.title}`"
-            prepend-icon="mdi-chat-outline" active-color="primary" class="mb-1 tech-list-item relative text-white"
-            :class="{ 'active-chat': chat.id === activeChat?.id }" @click="chatStore.selectChat(chat.id)">
+          <v-list-item v-for="chat in chatStore.chats" :key="chat.id" :title="`${chat.title}`" active-color="primary"
+            class="mb-1 tech-list-item relative text-white" :class="{ 'active-chat': chat.id === activeChat?.id }"
+            @click="chatStore.selectChat(chat.id)">
             <template v-slot:append>
               <div class="chat-actions">
                 <v-btn icon size="small" variant="text" class="action-btn edit-btn" @click.stop="editChatTitle(chat)">

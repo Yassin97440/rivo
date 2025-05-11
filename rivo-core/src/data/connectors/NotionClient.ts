@@ -135,8 +135,7 @@ export class NotionClient {
     async getPageContent(page: NotionPageData): Promise<BlockData> {
         try {
             const pageBlocks = await this.getPageBlocks(page.id);
-            const allPageContent =  this.extractAllBlocksData(pageBlocks.results, page);
-            console.log("🚀 ~ NotionClient ~ getPageContent ~ allPageContent:", allPageContent)
+            const allPageContent = this.extractAllBlocksData(pageBlocks.results, page);
             return allPageContent;
 
         } catch (error) {

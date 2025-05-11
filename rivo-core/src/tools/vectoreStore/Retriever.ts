@@ -23,20 +23,25 @@ const initVectorStore = async () => {
   }
 };
 
-const retrieve = tool(
+const retrieveTool = tool(
   async ({ query }) => {
-    if (!vectorStore) await initVectorStore();
-    console.log("retrieving for query", query);
-    const retrievedDocs = await vectorStore.similaritySearch(query.toString(), 4);
+    try {
+      if (!vectorStore) await initVectorStore();
+      console.log("retrieving for query", query);
+      const retrievedDocs = await vectorStore.similaritySearch(query.toString(), 7);
 
-    const serialized = retrievedDocs
-      .map(
-        (doc) => `Source: ${doc.metadata.url}\nContent: ${doc.pageContent}`
-      )
-      .join("\n");
+      const serialized = retrievedDocs
+        .map(
+          (doc) => `Source: ${doc.metadata.url}\nContent: ${doc.pageContent}`
+        )
+        .join("\n");
 
-    console.log("🚀 ~ serialized:", serialized)
-    return [serialized, retrievedDocs];
+      console.log("🚀 ~ serialized:", serialized)
+      return [serialized, retrievedDocs];
+    } catch (error) {
+      console.error("Erreur lors de la récupération des documents:", error);
+      throw error;
+    }
   },
   {
     name: "retrieve_information_and_context",
@@ -46,4 +51,4 @@ const retrieve = tool(
   }
 );
 
-export default retrieve;
+export default retrieveTool;

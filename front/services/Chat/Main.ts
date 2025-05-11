@@ -4,10 +4,10 @@ import type { Document } from "langchain/document";
 import type { BaseMessage } from "@langchain/core/messages";
 import { isAIMessage } from "@langchain/core/messages";
 import type { AIMessage } from "@langchain/core/messages";
-import { ChatGraph, getMemoryConfig } from "@yassin97440/rivo-core";
+import { getMemoryConfig } from "@yassin97440/rivo-core";
 import { updateRetrieverConfig } from "@yassin97440/rivo-core";
-import type ChatParams from "../../../core/dist/types/ChatParams";
-
+import type ChatParams from "../../../rivo-core/dist/types/ChatParams";
+import { supervisorGraph } from "@yassin97440/rivo-core";
 export class Main {
     private static instance: Main;
     private graph: any;
@@ -25,9 +25,7 @@ export class Main {
     public async initialize(chatParams: ChatParams): Promise<void> {
 
         updateRetrieverConfig(chatParams.credentials);
-
-        const graphManager = ChatGraph.getInstance(chatParams.model || "mistral", chatParams.temperature || 0.1);
-        this.graph = graphManager.getGraph();
+        this.graph = await supervisorGraph;
         this.initialized = true;
     }
 
@@ -50,7 +48,7 @@ export class Main {
         const lastMessage = chatParams.activeChat.messages[chatParams.activeChat.messages.length - 1] || { role: 'user', content: 'hello' };
         const memoryConfig = getMemoryConfig(chatParams.activeChat.id);
         // Exécuter le graphe avec la question
-        const response = await this.graph.invoke({ messages: lastMessage as Messages, history: chatParams.activeChat.messages }, memoryConfig);
+        const response = await this.graph.invoke({ messages: lastMessage as Messages, history: chatParams.activeChat.messages }, { recursionLimit: 25 }, memoryConfig);
 
         return response.messages[response.messages.length - 1]?.content;
     }
