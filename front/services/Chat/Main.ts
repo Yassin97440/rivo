@@ -8,6 +8,7 @@ import { getMemoryConfig } from "@yassin97440/rivo-core";
 import { updateRetrieverConfig } from "@yassin97440/rivo-core";
 import type ChatParams from "../../../rivo-core/dist/types/ChatParams";
 import { supervisorGraph } from "@yassin97440/rivo-core";
+import type { RunnableConfig } from "@langchain/core/runnables";
 export class Main {
     private static instance: Main;
     private graph: any;
@@ -46,9 +47,16 @@ export class Main {
 
     private async generateResponse(chatParams: ChatParams) {
         const lastMessage = chatParams.activeChat.messages[chatParams.activeChat.messages.length - 1] || { role: 'user', content: 'hello' };
-        const memoryConfig = getMemoryConfig(chatParams.activeChat.id);
+        // const memoryConfig = getMemoryConfig(chatParams.activeChat.id);
+        const memoryConfig: RunnableConfig = {
+            configurable: {
+                thread_id: chatParams.activeChat.id
+            },
+            recursionLimit: 25
+        }
+        console.log("🚀 ~ Main ~ generateResponse ~ memoryConfig:", memoryConfig)
         // Exécuter le graphe avec la question
-        const response = await this.graph.invoke({ messages: lastMessage as Messages, history: chatParams.activeChat.messages }, { recursionLimit: 25 }, memoryConfig);
+        const response = await this.graph.invoke({ messages: lastMessage as Messages, history: chatParams.activeChat.messages}, memoryConfig);
 
         return response.messages[response.messages.length - 1]?.content;
     }
