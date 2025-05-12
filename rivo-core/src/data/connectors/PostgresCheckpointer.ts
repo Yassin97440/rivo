@@ -16,7 +16,7 @@ export class PostgresCheckpointer  {
 
     constructor() {
         this.pool = new Pool({
-            connectionString: 'postgresql://rivo-checkpointer:Abdulla423@82.29.184.26:5432/rivo'
+            connectionString: 'postgresql://rivo_checkpointer:@82.29.184.26:5432/rivo'
         });
         this.checkpointer = new PostgresSaver(this.pool);
         this.setup();

@@ -1,5 +1,6 @@
 export * from './data/index';
 export * from './processing/index';
+export * from './config/index';
 export * from './LLM/index';
 export * from './tools/index';
 export * from './graph/index';

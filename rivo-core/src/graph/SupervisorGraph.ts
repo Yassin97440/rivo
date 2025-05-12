@@ -1,9 +1,10 @@
-import { END, START, StateGraph } from "@langchain/langgraph";
+import { END, START, StateGraph, CompiledStateGraph } from "@langchain/langgraph";
 import { members, supervisorChain } from "../agents/Supervisor";
 import AgentState from "../config/AgentState";
 import { researcherNode } from "../agents/ResearcherAgent";
 import { vectorRetrieverNode } from "../agents/VectorRetriever";
 import { AIMessage, BaseMessage } from "@langchain/core/messages";
+import { PostgresCheckpointer } from "../data/connectors/PostgresCheckpointer";
 
 async function createSupervisorGraph() {
     // 1. Create the graph
@@ -33,7 +34,8 @@ async function createSupervisorGraph() {
     workflow.addEdge(START, "supervisor");
     workflow.addEdge("supervisor", END);
 
-    return workflow.compile();
+    const checkpointer = new PostgresCheckpointer();
+    return workflow.compile({ checkpointer: checkpointer.checkpointer });
 }
 
 const supervisorGraph = createSupervisorGraph();

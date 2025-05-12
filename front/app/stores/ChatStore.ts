@@ -1,8 +1,8 @@
 // stores/user.ts
 import { defineStore } from 'pinia'
 import type { Messages } from '@langchain/langgraph'
-import type ChatParams from '../../../core/src/types/ChatParams'
-import type DocumentProcessingParams from '../../../core/dist/types/DocumentProcessingParams'
+import type ChatParams from '../../../rivo-core/dist/types/ChatParams'
+import type DocumentProcessingParams from '../../../rivo-core/dist/types/DocumentProcessingParams'
 
 interface ChatStore {
     chats: Ref<Chat[]>,
