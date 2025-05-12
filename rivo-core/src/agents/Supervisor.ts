@@ -35,7 +35,7 @@ const prompt = ChatPromptTemplate.fromMessages([
     ["system", systemPrompt],
     new MessagesPlaceholder("messages"),
     [
-        "human",
+        "system",
         "Given the conversation above, who should act next?" +
         " Or should we FINISH? Select one of: {options}",
     ],
